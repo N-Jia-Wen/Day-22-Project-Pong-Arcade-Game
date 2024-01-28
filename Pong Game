@@ -1,0 +1,56 @@
+from turtle import Screen
+from paddle import Paddle
+from ball import Ball
+from scoreboard import ScoreBoard
+import time
+
+# Setting up screen:
+screen = Screen()
+screen.bgcolor("black")
+screen.setup(width=800, height=600)
+screen.title("Pong")
+screen.tracer(0)
+
+# Setting up paddle:
+paddle_r = Paddle((350, 0))
+paddle_l = Paddle((-350, 0))
+
+# Moving paddle:
+screen.listen()
+screen.onkeypress(fun=paddle_r.move_up, key="Up")
+screen.onkeypress(fun=paddle_r.move_down, key="Down")
+screen.onkeypress(fun=paddle_l.move_up, key="w")
+screen.onkeypress(fun=paddle_l.move_down, key="s")
+
+# Setting up ball
+ball = Ball()
+
+# Setting up scoreboard
+scoreboard = ScoreBoard()
+
+game_running = True
+
+while game_running is True:
+    screen.update()
+    time.sleep(0.03)
+    ball.ball_move()
+
+    # Wall bounce - Model answer multiplies self.y_move by -1 to get ball to bounce on wall (see ball.py):
+    if ball.ycor() >= 280 or ball.ycor() <= -280:
+        ball.wall_bounce()
+
+    # Paddle bounce - Model answer multiplies self.x_move by -1 to get ball to bounce on paddle (see ball.py):
+    if (ball.xcor() >= 320 or ball.xcor() <= -320) and (ball.distance(paddle_r) < 50 or ball.distance(paddle_l) < 50):
+        ball.paddle_bounce()
+
+    # If ball goes past boundary and is reset
+    if ball.xcor() > 390:
+        ball.reset_position()
+        scoreboard.l_point()
+
+    elif ball.xcor() < -390:
+        ball.reset_position()
+        scoreboard.r_point()
+
+
+screen.exitonclick()
